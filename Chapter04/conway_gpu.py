@@ -1,6 +1,8 @@
 # Conway's game of life in Python / CUDA C
 # written by Brian Tuomanen for "Hands on GPU Programming with Python and CUDA"
 
+# WS note: not yet running on python 3: animate shows a blank screen
+
 import pycuda.autoinit
 import pycuda.driver as drv
 from pycuda import gpuarray
@@ -65,28 +67,32 @@ conway_ker = ker.get_function("conway_ker")
      
 
 def update_gpu(frameNum, img, newLattice_gpu, lattice_gpu, N):
-    
-    conway_ker(  newLattice_gpu, lattice_gpu, grid=(N/32,N/32,1), block=(32,32,1)   )
-    
-    img.set_data(newLattice_gpu.get() )
-    
-    
-    lattice_gpu[:] = newLattice_gpu[:]
-    
-    return img
-    
+   
+   # WS mod: for python3, had to cast N/32 to int or else 'no registered converter...' error
+   conway_ker(  newLattice_gpu, lattice_gpu, grid=(int(N/32),int(N/32),1), block=(32,32,1)   )
+   
+   img.set_data(newLattice_gpu.get() )
+   
+   lattice_gpu[:] = newLattice_gpu[:]
+   
+   return img
+   
 
 if __name__ == '__main__':
-    # set lattice size
-    N = 128
-    
-    lattice = np.int32( np.random.choice([1,0], N*N, p=[0.25, 0.75]).reshape(N, N) )
-    lattice_gpu = gpuarray.to_gpu(lattice)
-    
-    newLattice_gpu = gpuarray.empty_like(lattice_gpu)        
+   # set lattice size
+   N = 128
+   
+   lattice = np.int32( np.random.choice([1,0], N*N, p=[0.25, 0.75]).reshape(N, N) )
+   lattice_gpu = gpuarray.to_gpu(lattice)
+   
+   newLattice_gpu = gpuarray.empty_like(lattice_gpu)        
 
-    fig, ax = plt.subplots()
-    img = ax.imshow(lattice_gpu.get(), interpolation='nearest')
-    ani = animation.FuncAnimation(fig, update_gpu, fargs=(img, newLattice_gpu, lattice_gpu, N, ) , interval=0, frames=1000, save_count=1000)    
-     
-    plt.show()
+   fig, ax = plt.subplots()
+
+   # WS mod: just getting a white frame: set vmin, vmax explicitly: didn't work
+   img = ax.imshow(lattice_gpu.get(), interpolation='nearest', vmin=0, vmax=1)
+
+   ani = animation.FuncAnimation(fig, update_gpu, fargs=(img, newLattice_gpu, lattice_gpu, N, ), 
+                                 interval=0, frames=1000, save_count=1000)    
+   
+   plt.show()
