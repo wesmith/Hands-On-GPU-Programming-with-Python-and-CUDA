@@ -36,15 +36,17 @@ def simple_mandelbrot(width, height, real_low, real_high, imag_low, imag_high, m
 
 if __name__ == '__main__':
     
+    siz = 256 * 1  # WS mod
+
     t1 = time()
-    mandel = simple_mandelbrot(512,512,-2,2,-2,2,256, 2.5)
+    mandel = simple_mandelbrot(512,512,-2,2,-2,2,siz, 2.5)
     t2 = time()
     mandel_time = t2 - t1
     
     t1 = time()
     fig = plt.figure(1)
     plt.imshow(mandel, extent=(-2, 2, -2, 2))
-    plt.savefig('Chapter01/mandelbrot.png', dpi=fig.dpi)
+    plt.savefig('Chapter01/mandelbrot_{}.png'.format(siz), dpi=fig.dpi)
     t2 = time()
     
     dump_time = t2 - t1
