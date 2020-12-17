@@ -67,7 +67,7 @@ def linear_interp(a, dmin, dmax):
 
 if __name__ == '__main__':
 
-    siz       = 512 * 16  # WS mod
+    siz       = 512 * 2  # WS mod
     max_iters = 256      # WS mod
     # WS mod: three_channel: True  use 3-channel color display, with slightly different upper 
     #                              bounds per channel
